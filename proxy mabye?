@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bookmarklet GUI with Additional Proxies</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    h1 {
+      text-align: center;
+    }
+    
+    .bookmarklet-container {
+      margin: 20px auto;
+      max-width: 400px;
+    }
+    
+    .bookmarklet-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+    
+    .proxy-select {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bookmarklet GUI with Additional Proxies</h1>
+  
+  <div class="bookmarklet-container">
+    <button id="bookmarklet-button" class="bookmarklet-button">Run Bookmarklet</button>
+    <select id="proxy-select" class="proxy-select">
+      <option value="">No Proxy</option>
+      <option value="http://proxy1.example.com">Proxy 1</option>
+      <option value="http://proxy2.example.com">Proxy 2</option>
+      <option value="http://proxy3.example.com">Proxy 3</option>
+    </select>
+  </div>
+
+  <script>
+    var bookmarkletButton = document.getElementById('bookmarklet-button');
+    var proxySelect = document.getElementById('proxy-select');
+
+    bookmarkletButton.addEventListener('click', function() {
+      var proxyUrl = proxySelect.value;
+      var bookmarkletCode = 'YOUR_BOOKMARKLET_CODE'; // Replace with your actual bookmarklet code
+
+      if (proxyUrl) {
+        bookmarkletCode = 'javascript:(function(){' +
+          'var script=document.createElement(\'script\');' +
+          'script.src=\'' + proxyUrl + '/path/to/bookmarklet.js\';' +
+          'document.body.appendChild(script);})();';
+      }
+
+      // Create a bookmarklet link dynamically
+      var bookmarkletLink = document.createElement('a');
+      bookmarkletLink.href = bookmarkletCode;
+      bookmarkletLink.innerHTML = 'Drag to Bookmark Bar';
+
+      // Create a container for the bookmarklet link
+      var bookmarkletContainer = document.createElement('div');
+      bookmarkletContainer.appendChild(bookmarkletLink);
+
+      // Replace the bookmarklet button with the bookmarklet link
+      bookmarkletButton.parentNode.replaceChild(bookmarkletContainer, bookmarkletButton);
+    });
+  </script>
+</body>
+</html>
