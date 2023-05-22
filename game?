@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bookmarklet Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    h1 {
+      text-align: center;
+    }
+    
+    .bookmarklet-container {
+      margin: 20px auto;
+      max-width: 400px;
+    }
+    
+    .bookmarklet-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+    
+    .game-container {
+      position: relative;
+      width: 200px;
+      height: 400px;
+      margin: 20px auto;
+      border: 1px solid #000;
+    }
+    
+    .player {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: blue;
+      top: 380px;
+      left: 90px;
+    }
+    
+    .falling-square {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: red;
+      top: -20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bookmarklet Game</h1>
+  
+  <div class="bookmarklet-container">
+    <button id="bookmarklet-button" class="bookmarklet-button">Start Game</button>
+  </div>
+  
+  <div id="game-container" class="game-container">
+    <div id="player" class="player"></div>
+  </div>
+
+  <script>
+    var gameContainer = document.getElementById('game-container');
+    var player = document.getElementById('player');
+    var fallingSquares = [];
+    var score = 0;
+
+    function startGame() {
+      document.getElementById('bookmarklet-button').style.display = 'none';
+      document.addEventListener('keydown', movePlayer);
+
+      setInterval(function() {
+        createFallingSquare();
+      }, 1000);
+
+      setInterval(function() {
+        updateGame();
+      }, 20);
+    }
+
+    function movePlayer(event) {
+      var key = event.keyCode;
+      if (key === 37) {
+        // Left arrow key
+        moveLeft();
+      } else if (key === 39) {
+        // Right arrow key
+        moveRight();
+      }
+    }
+
+    function moveLeft() {
+      var left = parseInt(window.getComputedStyle(player).left);
+      if (left > 0) {
+        player.style.left = (left - 10) + 'px';
+      }
+    }
+
+    function moveRight() {
+      var left = parseInt(window.getComputedStyle(player).left);
+      var containerWidth = gameContainer.offsetWidth;
+      var playerWidth = player.offsetWidth;
+      if (left < (containerWidth - playerWidth)) {
+        player.style.left = (left + 10) + 'px';
+      }
+    }
+
+    function createFallingSquare() {
+      var fallingSquare = document.createElement('div');
+      fallingSquare.className = 'falling-square';
+      var randomLeft = Math.floor(Math.random() * 180);
+      fallingSquare.style.left = randomLeft + 'px';
+      gameContainer.appendChild(fallingSquare);
+      fallingSquares.push(fallingSquare);
+    }
+
+    function updateGame() {
+      for (var i = 0; i < fallingSquares.length; i++) {
+        var square = fallingSquares[i];
+        var top = parseInt(window.getComputedStyle(square).top);
+        if (top >= 400) {
+          if (isPlayerColliding(square)) {
+            endGame();
+            return;
+          }
+          square.remove();
+          fallingSquares.splice(i, 1);
+          i--;
+          score++;
+        } else {
+          square.style.top = (top + 1) + 'px';
+        }
+      }
+    }
+
+    function isPlayerColliding(square) {
+      var playerRect = player.getBoundingClientRect();
+      var squareRect = square.getBoundingClientRect();
+      return (
+        playerRect.left < squareRect.right &&
+        playerRect.right > squareRect.left &&
+        playerRect.top < squareRect.bottom &&
+        playerRect.bottom > squareRect.top
+      );
+    }
+
+    function endGame() {
+      document.removeEventListener('keydown', movePlayer);
+      alert('Game Over!\nScore: ' + score);
+      resetGame();
+    }
+
+    function resetGame() {
+      gameContainer.innerHTML = '<div id="player" class="player"></div>';
+      player = document.getElementById('player');
+      fallingSquares = [];
+      score = 0;
+      document.getElementById('bookmarklet-button').style.display = 'block';
+    }
+
+    document.getElementById('bookmarklet-button').addEventListener('click', startGame);
+  </script>
+</body>
+</html>
